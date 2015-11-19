@@ -1,0 +1,15 @@
+{
+  "name": "mbench",
+  "version": "1.0.0",
+  "description": "Micro-benchmark tool reporting both time and memory",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Christopher Schuster <cs@livoris.net>",
+  "license": "ISC",
+  "dependencies": {
+    "memwatch-next": "^0.2.10",
+    "microtime": "^2.0.0"
+  }
+}

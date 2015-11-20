@@ -7,6 +7,45 @@ function range(n) {
   return result;
 }
 
+function warmup(func, opts) {
+  var start = microtime.now();
+  do {
+    opts.setup();
+    func();
+    end = microtime.now();
+  } while(end - start < opts.warmup);
+}
+
+function benchTime(func, opts) {
+  var start = microtime.now();
+  var setups = 0;
+  do {
+    opts.setup();
+    setups++;
+    end = microtime.now();
+  } while(end - start < opts.runtime || setups < 3);
+  var timeForSetUps = (end - start) / setups;
+  start = microtime.now();
+  var runs = 0;
+  do {
+    opts.setup();
+    func();
+    runs++;
+    end = microtime.now();
+  } while(end - start < opts.runtime || runs < 10);
+  return (end - start) / runs - timeForSetUps;
+}
+
+function benchMemory(func, opts) {
+  opts.setup();
+  global.gc();
+  var hd = new memwatch.HeapDiff();
+  var res = func();
+  global.gc();
+  var diff = hd.end();
+  return [diff.after.size_bytes - diff.before.size_bytes + 25000, res];
+}
+
 /**
  * Runs a benchmark for time and memory
  *
@@ -17,27 +56,10 @@ function range(n) {
 module.exports = (func, opts) => {
   opts = opts || {};
   opts.setup = opts.setup || () => null;
-  opts.warmup = opts.warmup || 1000;
-  opts.runs = opts.runs || 1000;
-  range(opts.warmup).map(() => {
-    opts.setup();
-    func();
-  });
-  var time = range(opts.runs)
-    .map(() => {
-      opts.setup();
-      var start = microtime.now();
-      func();
-      return microtime.now() - start;
-    })
-    .reduce((sum, i) => sum + i, 0) / opts.runs;
-  opts.setup();
-  var hd = new memwatch.HeapDiff();
-  var diff = hd.end();
-  var base = diff.after.size_bytes - diff.before.size_bytes;
-  diff = null;
-  hd = new memwatch.HeapDiff();
-  var res = func();
-  diff = hd.end();
-  return [time, diff.after.size_bytes - diff.before.size_bytes - base, res];
+  opts.warmup = opts.warmup || 100000;
+  opts.runtime = opts.runtime || 1000000;
+  warmup(func, opts);
+  var time = benchTime(func, opts);
+  var memory = benchMemory(func, opts)[0];
+  return [Math.max(0, time), Math.max(0, memory)];
 }

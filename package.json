@@ -4,7 +4,7 @@
   "description": "Micro-benchmark tool reporting both time and memory",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --harmony --expose-gc test.js"
   },
   "author": "Christopher Schuster <cs@livoris.net>",
   "license": "ISC",

@@ -38,12 +38,10 @@ function benchTime(func, opts) {
 
 function benchMemory(func, opts) {
   opts.setup();
-  global.gc();
   var hd = new memwatch.HeapDiff();
   var res = func();
-  global.gc();
   var diff = hd.end();
-  return [diff.after.size_bytes - diff.before.size_bytes + 25000, res];
+  return [diff.after.size_bytes, res];
 }
 
 /**

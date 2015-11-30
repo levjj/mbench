@@ -4,7 +4,7 @@
   "description": "Micro-benchmark tool reporting both time and memory",
   "main": "index.js",
   "scripts": {
-    "test": "node --harmony --expose-gc test.js"
+    "test": "node --harmony test.js"
   },
   "author": "Christopher Schuster <cs@livoris.net>",
   "license": "ISC",
